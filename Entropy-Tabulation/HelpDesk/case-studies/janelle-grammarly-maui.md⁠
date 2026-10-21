@@ -1,0 +1,27 @@
+# Case Study: Resolving Intermittent Grammarly Detachment in Salesforce Maui
+
+**Client/User:** Janelle  
+**Environment:** Google Chrome | Salesforce Maui Console  
+**Severity:** Tier 1 Workflow Friction  
+**Resolution:** OS-level Native Integration  
+
+---
+
+## 1. Issue Summary
+The user experienced intermittent failures with the Grammarly browser extension inside the Salesforce Maui ticketing environment. Corrections and floating indicator widgets vanished when navigating between records and sub-tabs.
+
+---
+
+## 2. Technical Investigation & Root Cause
+Inspection identified two underlying architectural obstacles inherent to enterprise Salesforce deployments:
+* **DOM Sandboxing:** Maui utilizes encapsulated sub-frames and Shadow DOM components that restrict web extension content scripts from reading or modifying the inner document tree.
+* **SPA Lifecycle Drops:** As a Single Page Application, Maui updates viewstates without full browser reloads, causing Chrome extension content scripts to drop input listener bindings.
+
+---
+
+## 3. Implementation & Verification
+Rather than applying brittle DOM-mutation overrides or browser permission hacks, the solution bypassed the browser engine entirely:
+
+1. **Installed Grammarly Desktop Client:** Configured the native OS application to leverage system accessibility APIs instead of DOM-injected JavaScript.
+2. **Removed Conflicting Extensions:** Disabled the Grammarly Chrome extension (`chrome://extensions`) to eliminate dual-hook race conditions.
+3. **End-to-End Validation:** Tested inside Maui ticket fields across multiple tab switches. The native floating widget persisted across dynamic re-renders with immediate input correction.
